@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Spring Onboarding 流程深度诊断报告</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400;1,6..72,500&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,500;0,8..60,600;1,8..60,400&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#FCFCFA; --paper-2:#F8F7F2;
+  --surface:#FFFFFF; --surface-soft:#F4F4F0;
+  --ink:#1A1A1A; --ink-2:#3F3F46; --ink-3:#52525B;
+  --muted:#71717A; --muted-2:#A1A1AA;
+  --line:#E4E4E0; --line-soft:#EFEFEA; --line-strong:#D4D4D0;
+  --accent:#B45309; --accent-mid:#D97706;
+  --accent-soft:#FEF3C7; --accent-bg:#FFFBEB; --accent-line:#FDE68A;
+  --green:#0F8A47; --green-soft:#DCFCE7;
+  --red:#B91C1C; --red-soft:#FEE2E2;
+  --blue:#1E40AF; --blue-soft:#DBEAFE;
+  --display:'Newsreader','Source Serif 4',Georgia,'Songti SC',serif;
+  --body:'Source Serif 4','Newsreader',Georgia,'Songti SC',serif;
+  --sans:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif;
+  --mono:'Geist Mono','JetBrains Mono',ui-monospace,monospace;
+}
+*{box-sizing:border-box;}
+body{
+  font-family:var(--body);background:var(--paper);color:var(--ink);
+  margin:0;padding:0;font-size:16px;line-height:1.75;
+  font-feature-settings:'onum','liga';
+  -webkit-font-smoothing:antialiased;
+}
+main{max-width:1180px;margin:0 auto;padding:0 32px;}
+
+/* ====== Top banner ====== */
+.topbar{
+  border-bottom:1px solid var(--line);background:var(--paper);
+  position:sticky;top:0;z-index:50;
+}
+.topbar-inner{
+  max-width:1180px;margin:0 auto;padding:14px 32px;
+  display:flex;justify-content:space-between;align-items:center;
+  font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;
+}
+.topbar .brand{color:var(--ink);font-weight:500;display:flex;align-items:center;gap:8px;}
+.topbar .brand::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--accent);}
+
+/* ====== Cover ====== */
+.cover{padding:80px 0 60px;border-bottom:1px solid var(--ink);margin-bottom:48px;}
+.cover .meta{
+  font-family:var(--mono);font-size:11px;color:var(--muted);
+  letter-spacing:.06em;text-transform:uppercase;margin-bottom:24px;display:flex;gap:16px;flex-wrap:wrap;
+}
+.cover .meta span{padding-right:14px;border-right:1px solid var(--line);}
+.cover .meta span:last-child{border-right:none;}
+.cover .meta b{color:var(--ink);font-weight:500;}
+.cover h1{
+  font-family:var(--display);font-weight:500;
+  font-size:clamp(40px,6vw,72px);line-height:1.02;letter-spacing:-.025em;
+  margin:0 0 20px;
+}
+.cover h1 em{font-style:italic;font-weight:400;color:var(--accent);}
+.cover .deck{
+  font-family:var(--display);font-style:italic;font-weight:400;
+  font-size:21px;line-height:1.5;color:var(--ink-2);max-width:680px;margin:0 0 40px;
+}
+.cover .kpi-row{
+  display:grid;grid-template-columns:repeat(5,1fr);gap:0;
+  border-top:1px solid var(--ink);border-bottom:1px solid var(--line);padding:24px 0;
+}
+@media (max-width:768px){.cover .kpi-row{grid-template-columns:1fr 1fr;}}
+.cover .kpi-row > div{padding:0 20px;border-right:1px solid var(--line);}
+.cover .kpi-row > div:first-child{padding-left:0;}
+.cover .kpi-row > div:last-child{border-right:none;padding-right:0;}
+.cover .kpi .label{
+  font-family:var(--mono);font-size:10.5px;color:var(--muted);
+  text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;
+}
+.cover .kpi .value{
+  font-family:var(--display);font-size:42px;font-weight:500;color:var(--ink);
+  line-height:1;letter-spacing:-.02em;font-feature-settings:'tnum','lnum';
+}
+.cover .kpi .value.accent{color:var(--accent);}
+.cover .kpi .value.red{color:var(--red);}
+.cover .kpi .value.green{color:var(--green);}
+.cover .kpi .sub{
+  font-family:var(--sans);font-size:11.5px;color:var(--muted);margin-top:8px;
+}
+
+/* ====== Section ====== */
+section{padding:48px 0 64px;border-bottom:1px solid var(--line);}
+section:last-of-type{border-bottom:none;}
+
+h2.head{
+  font-family:var(--display);font-weight:500;font-size:32px;letter-spacing:-.015em;
+  margin:0 0 8px;color:var(--ink);
+}
+h2.head em{font-style:italic;color:var(--accent);font-weight:400;}
+.head-deck{
+  font-family:var(--body);font-style:italic;font-size:16px;color:var(--muted);
+  margin:0 0 36px;max-width:700px;
+}
+h3.sub{
+  font-family:var(--sans);font-size:11.5px;font-weight:600;color:var(--ink);
+  margin:36px 0 16px;text-transform:uppercase;letter-spacing:.08em;
+  padding-bottom:10px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px;
+}
+h3.sub .marker{
+  font-family:var(--display);font-size:18px;font-style:italic;color:var(--accent);
+}
+h3.sub .count{
+  font-family:var(--mono);font-size:10.5px;font-weight:400;color:var(--muted);
+  text-transform:none;margin-left:auto;
+}
+
+/* ====== Funnel ====== */
+.funnel{
+  display:flex;flex-direction:column;gap:6px;max-width:760px;margin:24px 0;
+}
+.funnel-row{
+  display:grid;grid-template-columns:160px 1fr 100px 100px;gap:16px;align-items:center;
+  padding:14px 0;border-bottom:1px solid var(--line-soft);
+}
+.funnel-row:last-child{border-bottom:none;}
+.funnel-row .stage{
+  font-family:var(--sans);font-size:13.5px;font-weight:600;color:var(--ink);
+}
+.funnel-row .stage .sub{
+  font-family:var(--mono);font-size:10.5px;color:var(--muted);font-weight:400;
+  display:block;margin-top:2px;
+}
+.funnel-bar{
+  background:var(--paper-2);border-radius:2px;height:32px;position:relative;overflow:hidden;
+  border:1px solid var(--line);
+}
+.funnel-bar .fill{
+  height:100%;background:linear-gradient(90deg,var(--accent),var(--accent-mid));
+  transition:width .4s;
+}
+.funnel-bar .fill.dim{background:linear-gradient(90deg,var(--muted-2),var(--line-strong));}
+.funnel-bar .num{
+  position:absolute;left:12px;top:50%;transform:translateY(-50%);
+  font-family:var(--mono);font-size:13px;font-weight:600;color:white;
+  font-variant-numeric:tabular-nums;text-shadow:0 0 4px rgba(0,0,0,.3);
+}
+.funnel-row .pct{
+  font-family:var(--mono);font-size:13px;color:var(--ink-2);text-align:right;font-variant-numeric:tabular-nums;
+}
+.funnel-row .drop{
+  font-family:var(--mono);font-size:11px;color:var(--red);text-align:right;font-variant-numeric:tabular-nums;
+}
+
+/* ====== Cards ====== */
+.row{display:grid;gap:16px;}
+.row.c2{grid-template-columns:1fr 1fr;}
+.row.c3{grid-template-columns:repeat(3,1fr);}
+.row.c4{grid-template-columns:repeat(4,1fr);}
+@media (max-width:900px){.row.c2,.row.c3,.row.c4{grid-template-columns:1fr;}}
+
+.card{
+  background:var(--surface);border:1px solid var(--line);border-radius:4px;
+  padding:20px 22px;
+}
+.card .label{
+  font-family:var(--mono);font-size:10.5px;color:var(--muted);
+  text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;
+}
+.card .value{
+  font-family:var(--display);font-size:36px;font-weight:500;color:var(--ink);
+  line-height:1;font-variant-numeric:tabular-nums;
+}
+.card .value.accent{color:var(--accent);}
+.card .value.red{color:var(--red);}
+.card .value.green{color:var(--green);}
+.card .desc{
+  font-family:var(--body);font-size:13.5px;color:var(--ink-3);margin-top:10px;line-height:1.55;
+}
+
+/* ====== Callout ====== */
+.callout{
+  background:var(--surface);border:1px solid var(--line);border-radius:4px;
+  padding:18px 22px;margin:18px 0;position:relative;
+  font-family:var(--body);font-size:14.5px;line-height:1.7;color:var(--ink-2);
+}
+.callout::before{
+  content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--ink-3);border-radius:4px 0 0 4px;
+}
+.callout.danger::before{background:var(--red);}
+.callout.warn::before{background:var(--accent);}
+.callout.success::before{background:var(--green);}
+.callout.info::before{background:var(--blue);}
+.callout .ctitle{
+  font-family:var(--sans);font-weight:600;font-size:13.5px;color:var(--ink);
+  margin-bottom:10px;display:flex;align-items:center;gap:10px;
+}
+.callout .ctitle .tag{
+  font-family:var(--mono);font-size:9.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;
+  padding:2px 8px;background:var(--paper-2);border:1px solid var(--line);border-radius:3px;
+}
+.callout b{color:var(--ink);font-weight:600;}
+.callout ul{margin:8px 0 0;padding-left:22px;}
+.callout li{margin-bottom:6px;}
+.callout li::marker{color:var(--accent);font-size:.85em;}
+
+/* ====== Tables ====== */
+.table-wrap{
+  background:var(--surface);border:1px solid var(--line);border-radius:4px;
+  overflow:hidden;
+}
+table.data{width:100%;border-collapse:collapse;font-family:var(--sans);font-size:13px;}
+table.data th{
+  background:var(--paper-2);padding:12px 16px;text-align:left;
+  font-family:var(--mono);font-weight:500;color:var(--muted);
+  border-bottom:1px solid var(--line);
+  font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;white-space:nowrap;
+}
+table.data td{
+  padding:12px 16px;border-bottom:1px solid var(--line-soft);
+  color:var(--ink-2);vertical-align:middle;
+}
+table.data tr:last-child td{border-bottom:none;}
+table.data .num{text-align:right;font-family:var(--mono);font-variant-numeric:tabular-nums;color:var(--ink);font-size:12.5px;}
+table.data tr:hover td{background:var(--paper);}
+table.data b.accent{color:var(--accent);font-family:var(--mono);}
+table.data b.red{color:var(--red);font-family:var(--mono);}
+table.data tr.hl td{background:var(--accent-soft);font-weight:600;}
+table.data tr.hl:hover td{background:var(--accent-soft);}
+
+/* ====== Distribution bar ====== */
+.dist-bar{
+  display:flex;height:36px;border-radius:4px;overflow:hidden;border:1px solid var(--line);margin:8px 0;
+}
+.dist-bar > div{
+  font-family:var(--mono);font-size:11px;font-weight:600;color:white;
+  display:flex;align-items:center;justify-content:center;
+  text-shadow:0 0 4px rgba(0,0,0,.3);
+}
+.dist-bar .seg-1{background:#84CC16;} /* fast - green-lime */
+.dist-bar .seg-2{background:#A3E635;}
+.dist-bar .seg-3{background:#FACC15;} /* medium - yellow */
+.dist-bar .seg-4{background:#F97316;} /* slow - orange */
+.dist-bar .seg-5{background:#DC2626;} /* very slow - red */
+.dist-legend{
+  display:flex;gap:14px;font-family:var(--mono);font-size:11px;color:var(--muted);flex-wrap:wrap;margin-bottom:6px;
+}
+.dist-legend .dot{width:8px;height:8px;border-radius:2px;display:inline-block;margin-right:4px;vertical-align:middle;}
+
+/* ====== Mini chart ====== */
+.mini-bar{
+  background:var(--paper-2);height:18px;position:relative;border-radius:2px;overflow:hidden;
+  border:1px solid var(--line);min-width:60px;
+}
+.mini-bar .fill{height:100%;background:var(--accent);}
+
+/* ====== Pullquote ====== */
+.pullquote{
+  font-family:var(--display);font-style:italic;font-size:24px;line-height:1.5;
+  color:var(--ink);max-width:760px;padding:20px 0 20px 32px;
+  border-left:2px solid var(--accent);margin:32px 0;
+}
+.pullquote .attr{
+  display:block;font-family:var(--mono);font-style:normal;font-size:11px;
+  color:var(--muted);margin-top:14px;letter-spacing:.04em;text-transform:uppercase;
+}
+
+/* ====== Footer ====== */
+.colophon{
+  margin-top:60px;padding:32px 0 60px;border-top:2px solid var(--ink);
+  font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:.04em;
+}
+.colophon b{color:var(--ink);font-weight:500;}
+
+@media print{
+  .topbar{display:none;}
+  body{font-size:11pt;}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <div class="brand">Solvely · Onboarding Diagnostic Report</div>
+    <div>Spring 2026 · v1.0</div>
+  </div>
+</div>
+
+<main>
+
+<!-- ============ COVER ============ -->
+<div class="cover">
+  <div class="meta">
+    <span><b>Date Range</b> 2026-03-27 — 2026-05-14</span>
+    <span><b>Records</b> 192 candidates</span>
+    <span><b>~7 min read</b></span>
+  </div>
+
+  <h1>Spring Onboarding<br>流程深度<em>诊断</em>。</h1>
+  <p class="deck">
+    192 个春季候选人的 Yes → Onboarding 全链路漏斗分析——哪些环节是漏点、效率多高、为什么有人没完成、Fall 招募该优化什么。
+  </p>
+
+  <div class="kpi-row">
+    <div class="kpi">
+      <div class="label">总候选人</div>
+      <div class="value">192</div>
+      <div class="sub">已发 191 offer</div>
+    </div>
+    <div class="kpi">
+      <div class="label">完成 Onboarding</div>
+      <div class="value green">117</div>
+      <div class="sub">完成率 <b>61%</b></div>
+    </div>
+    <div class="kpi">
+      <div class="label">已终止</div>
+      <div class="value red">25</div>
+      <div class="sub">终止率 <b>13%</b></div>
+    </div>
+    <div class="kpi">
+      <div class="label">在途未完成</div>
+      <div class="value accent">50</div>
+      <div class="sub">中位卡在<b>合同环节</b></div>
+    </div>
+    <div class="kpi">
+      <div class="label">中位完成时长</div>
+      <div class="value">3<span style="font-size:18px;color:var(--muted);"> 天</span></div>
+      <div class="sub">p75 = 8 天</div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ §1 漏斗 ============ -->
+<section>
+  <h2 class="head">01 · 完整漏斗 <em>全景图</em></h2>
+  <p class="head-deck">192 个候选人在 Yes → Onboarding 流程的逐级转化情况。每一级的"丢掉的人"对应右侧 drop 数。</p>
+
+  <div class="funnel">
+    <div class="funnel-row">
+      <div class="stage">总候选人<span class="sub">数据库录入</span></div>
+      <div class="funnel-bar"><div class="fill" style="width:100%"></div><div class="num">192</div></div>
+      <div class="pct">100%</div>
+      <div class="drop">—</div>
+    </div>
+    <div class="funnel-row">
+      <div class="stage">发 offer<span class="sub">Yes</span></div>
+      <div class="funnel-bar"><div class="fill" style="width:99.5%"></div><div class="num">191</div></div>
+      <div class="pct">99%</div>
+      <div class="drop">−1</div>
+    </div>
+    <div class="funnel-row">
+      <div class="stage">发合同<span class="sub">Contract sent</span></div>
+      <div class="funnel-bar"><div class="fill" style="width:82%"></div><div class="num">157</div></div>
+      <div class="pct">82%</div>
+      <div class="drop">−34</div>
+    </div>
+    <div class="funnel-row">
+      <div class="stage">签合同<span class="sub">Contract signed</span></div>
+      <div class="funnel-bar"><div class="fill" style="width:65%"></div><div class="num">125</div></div>
+      <div class="pct">65%</div>
+      <div class="drop">−32</div>
+    </div>
+    <div class="funnel-row">
+      <div class="stage">发 Slack 邀请<span class="sub">Account ready</span></div>
+      <div class="funnel-bar"><div class="fill" style="width:60%"></div><div class="num">116</div></div>
+      <div class="pct">60%</div>
+      <div class="drop">−9</div>
+    </div>
+    <div class="funnel-row">
+      <div class="stage">完成 Onboarding<span class="sub">Joined Slack ✓</span></div>
+      <div class="funnel-bar"><div class="fill" style="width:61%"></div><div class="num">117</div></div>
+      <div class="pct">61%</div>
+      <div class="drop">+1 滞后</div>
+    </div>
+  </div>
+
+  <div class="row c3" style="margin-top:32px;">
+    <div class="card">
+      <div class="label">最大单环节漏点</div>
+      <div class="value red">−34</div>
+      <div class="desc"><b>发offer → 发合同</b>。这里损失了 18% 的候选人——很多人收到 offer 后没回复或拒绝。</div>
+    </div>
+    <div class="card">
+      <div class="label">第二漏点</div>
+      <div class="value red">−32</div>
+      <div class="desc"><b>发合同 → 签合同</b>。损失 17%。终止数据显示这里的人多数是"看完合同不签"。</div>
+    </div>
+    <div class="card">
+      <div class="label">下游环节都很丝滑</div>
+      <div class="value green">94%</div>
+      <div class="desc">签合同后还能继续走到加入 Slack 的概率。一旦签了合同，几乎都能完成 onboarding。</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ §2 终止分析 ============ -->
+<section>
+  <h2 class="head">02 · 终止分析 <em>· 在哪里掉、为什么掉</em></h2>
+  <p class="head-deck">25 个已终止候选人的环节分布 + 终止原因。这是优化转化率的最大杠杆。</p>
+
+  <h3 class="sub"><span class="marker">¶</span>终止在哪个环节</h3>
+
+  <div class="table-wrap">
+    <table class="data">
+      <thead>
+        <tr>
+          <th>环节</th>
+          <th class="num">终止人数</th>
+          <th class="num">占终止%</th>
+          <th>分布</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="hl">
+          <td><b>发合同后未签</b> <small style="color:var(--muted);">— 收到合同但没签字</small></td>
+          <td class="num"><b class="red">13</b></td>
+          <td class="num">52%</td>
+          <td><div class="mini-bar"><div class="fill" style="width:100%;background:var(--red);"></div></div></td>
+        </tr>
+        <tr>
+          <td>发 offer 后未签合同 <small style="color:var(--muted);">— 收到 offer 没回复</small></td>
+          <td class="num">6</td>
+          <td class="num">24%</td>
+          <td><div class="mini-bar"><div class="fill" style="width:46%;background:var(--accent);"></div></div></td>
+        </tr>
+        <tr>
+          <td>签合同后未建账号 <small style="color:var(--muted);">— 签了但没建社媒账号</small></td>
+          <td class="num">4</td>
+          <td class="num">16%</td>
+          <td><div class="mini-bar"><div class="fill" style="width:31%;background:var(--accent-mid);"></div></div></td>
+        </tr>
+        <tr>
+          <td>Slack 之后 <small style="color:var(--muted);">— 加群后又跑了</small></td>
+          <td class="num">2</td>
+          <td class="num">8%</td>
+          <td><div class="mini-bar"><div class="fill" style="width:15%;background:var(--muted-2);"></div></div></td>
+        </tr>
+        <tr style="border-top:2px solid var(--ink);">
+          <td><b>合计</b></td>
+          <td class="num"><b>25</b></td>
+          <td class="num">100%</td>
+          <td></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3 class="sub"><span class="marker">¶</span>终止原因 Top 8 <span class="count">22 人有明确原因</span></h3>
+
+  <div class="row c2">
+    <div class="table-wrap">
+      <table class="data">
+        <thead><tr><th>原因</th><th class="num">人数</th></tr></thead>
+        <tbody>
+          <tr class="hl"><td><b>失联</b>（不回消息 / 邮件无响应）</td><td class="num"><b class="red">9</b></td></tr>
+          <tr><td>有其他 offer</td><td class="num">3</td></tr>
+          <tr><td>不满意 basepay</td><td class="num">3</td></tr>
+          <tr><td>不想建新账号（1 个 / 3 个 / YouTube）</td><td class="num">3</td></tr>
+          <tr><td>竞业问题（含 turboai）</td><td class="num">2</td></tr>
+          <tr><td>没准备好 / 没精力</td><td class="num">1</td></tr>
+          <tr><td>不是学生</td><td class="num">1</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div>
+      <div class="callout danger">
+        <div class="ctitle"><span class="tag">Top Cause</span>失联占终止的 36%</div>
+        9 个人直接消失——既不签合同也不回邮件。这些人本来已经接了 offer，意味着<b>从接 offer 到签合同这段时间</b>是流失"黑洞"。
+        <br><br>
+        <b>修复方向：</b>offer 发出后 <b>24h 内自动跟进</b>，48h 后人工 nudge。把"失联期"压缩到极短。
+      </div>
+      <div class="callout warn">
+        <div class="ctitle"><span class="tag">需关注</span>basepay + 合同条款 共 6 人（24%）</div>
+        "不满意 basepay" + "不想建新账号 / 多个账号"占 24% 终止。<b>合同里的硬要求（独立账号、多平台、basepay 数额）应该在发 offer 之前就说清楚</b>，避免到签合同环节才发现。
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ §3 时效分析 ============ -->
+<section>
+  <h2 class="head">03 · 各环节时效 <em>· 流程本身够快</em></h2>
+  <p class="head-deck">117 个完成 onboarding 的人在每个环节的真实耗时分布。Median 都在 1 天以内——流程没问题，问题在"没动作的人"。</p>
+
+  <h3 class="sub"><span class="marker">¶</span>各阶段平均耗时</h3>
+
+  <div class="table-wrap">
+    <table class="data">
+      <thead>
+        <tr>
+          <th>环节</th>
+          <th class="num">Median</th>
+          <th class="num">Mean</th>
+          <th class="num">最长</th>
+          <th class="num">&gt;7 天%</th>
+          <th>评价</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>发 offer → 发合同</td>
+          <td class="num">0 天</td>
+          <td class="num">1.2 天</td>
+          <td class="num">17 天</td>
+          <td class="num">3%</td>
+          <td style="color:var(--green);">✓ 极快</td>
+        </tr>
+        <tr>
+          <td>发合同 → 签合同</td>
+          <td class="num">1 天</td>
+          <td class="num">1.7 天</td>
+          <td class="num">10 天</td>
+          <td class="num">3%</td>
+          <td style="color:var(--green);">✓ 流畅</td>
+        </tr>
+        <tr>
+          <td>签合同 → 建账号 / Slack 邀请</td>
+          <td class="num">1 天</td>
+          <td class="num">1.9 天</td>
+          <td class="num">22 天</td>
+          <td class="num">4%</td>
+          <td style="color:var(--green);">✓ 正常</td>
+        </tr>
+        <tr>
+          <td>Slack 邀请 → 加入</td>
+          <td class="num">0 天</td>
+          <td class="num">0.8 天</td>
+          <td class="num">16 天</td>
+          <td class="num">1%</td>
+          <td style="color:var(--green);">✓ 最快</td>
+        </tr>
+        <tr class="hl">
+          <td><b>总流程时长</b></td>
+          <td class="num"><b class="accent">3 天</b></td>
+          <td class="num">5.8 天</td>
+          <td class="num">31 天</td>
+          <td class="num">19%</td>
+          <td><b style="color:var(--accent);">⭐ 中位非常快</b></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3 class="sub"><span class="marker">¶</span>总流程时长分布 <span class="count">n = 117</span></h3>
+
+  <div class="dist-legend">
+    <span><span class="dot" style="background:#84CC16;"></span>0 天 (n=8)</span>
+    <span><span class="dot" style="background:#A3E635;"></span>1-3 天 (n=51)</span>
+    <span><span class="dot" style="background:#FACC15;"></span>4-7 天 (n=28)</span>
+    <span><span class="dot" style="background:#F97316;"></span>8-14 天 (n=19)</span>
+    <span><span class="dot" style="background:#DC2626;"></span>15+ 天 (n=11)</span>
+  </div>
+  <div class="dist-bar">
+    <div class="seg-1" style="flex:8;">8</div>
+    <div class="seg-2" style="flex:51;">51</div>
+    <div class="seg-3" style="flex:28;">28</div>
+    <div class="seg-4" style="flex:19;">19</div>
+    <div class="seg-5" style="flex:11;">11</div>
+  </div>
+  <p style="font-family:var(--body);font-size:13.5px;color:var(--ink-3);margin-top:14px;font-style:italic;max-width:760px;">
+    <b>50% 的人在 3 天内搞定</b>、<b>76% 在 7 天内</b>、剩下 24% 是"慢长尾"（8-31 天）。极端慢的 11 个人通常是因为：考试期、暑期实习、内部决策慢。流程本身没问题。
+  </p>
+
+  <div class="pullquote">
+    流程不是问题——快的人 3 天搞定，慢的人卡在沟通延迟而不是流程复杂。优化的杠杆在<em>"如何让慢的人快起来"</em>，而不是简化流程。
+    <span class="attr">— Insight on velocity distribution</span>
+  </div>
+</section>
+
+<!-- ============ §4 在途 50 人 ============ -->
+<section>
+  <h2 class="head">04 · 在途 50 人 <em>· 真正的隐藏风险</em></h2>
+  <p class="head-deck">既没完成也没明确终止的 50 个候选人。他们卡在哪里？大概率会怎样？这是 Fall 招募前最该跟进的人群。</p>
+
+  <h3 class="sub"><span class="marker">¶</span>在哪里卡住</h3>
+
+  <div class="table-wrap">
+    <table class="data">
+      <thead>
+        <tr>
+          <th>状态</th>
+          <th class="num">人数</th>
+          <th class="num">占 50 人%</th>
+          <th>预测最可能结果</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="hl">
+          <td><b>已发 offer，待发合同</b></td>
+          <td class="num"><b class="accent">24</b></td>
+          <td class="num">48%</td>
+          <td><span style="color:var(--red);">大概率终止</span> · 历史这里掉了 13 人 (52% 的终止)</td>
+        </tr>
+        <tr>
+          <td>已发合同，待签</td>
+          <td class="num">19</td>
+          <td class="num">38%</td>
+          <td><span style="color:var(--accent);">需主动 nudge</span> · 一签字就能继续</td>
+        </tr>
+        <tr>
+          <td>已签合同，待建账号 / 发 Slack 邀请</td>
+          <td class="num">5</td>
+          <td class="num">10%</td>
+          <td><span style="color:var(--green);">高概率完成</span> · 下游 94% 通过率</td>
+        </tr>
+        <tr>
+          <td>已发 Slack 邀请，等加入</td>
+          <td class="num">1</td>
+          <td class="num">2%</td>
+          <td><span style="color:var(--green);">大概率完成</span></td>
+        </tr>
+        <tr>
+          <td>未发 offer（漏了 / 数据 bug）</td>
+          <td class="num">1</td>
+          <td class="num">2%</td>
+          <td>—</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout warn" style="margin-top:24px;">
+    <div class="ctitle"><span class="tag">Action</span>这 50 人怎么处理</div>
+    <ul>
+      <li><b>24 个"待发合同"</b>：6/1 前一次性梳理，3 天内不动 → 标记终止；3 天内有响应 → 拉进 fall 复活池</li>
+      <li><b>19 个"待签合同"</b>：发个性化 DM 提醒，"再不签合同位置就要让给其他人了"</li>
+      <li><b>5 个"待建账号"</b>：直接 1-on-1 帮他们建账号，可能 5 个里能救回 3-4 个</li>
+    </ul>
+    <b>乐观估计：能救回 15-20 个</b>。最终 spring 完成率有机会从 61% 推到 70%。
+  </div>
+</section>
+
+<!-- ============ §5 每周节奏 ============ -->
+<section>
+  <h2 class="head">05 · 每周招聘节奏 <em>· Spring 真实速度</em></h2>
+  <p class="head-deck">8 周数据看出 spring 招聘曲线的真实形状。最高峰是 4 月中下旬，5 月已停招。</p>
+
+  <div class="table-wrap">
+    <table class="data">
+      <thead>
+        <tr>
+          <th>周</th>
+          <th class="num">本周加入</th>
+          <th class="num">本周完成 Onboarding</th>
+          <th class="num">本周内启动+完成</th>
+          <th class="num">本周终止</th>
+          <th class="num">滞留(待签合同+建号)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>04/03 - 04/09</td><td class="num"><b>31</b></td><td class="num">11</td><td class="num">11</td><td class="num">8</td><td class="num">1</td></tr>
+        <tr><td>04/10 - 04/16</td><td class="num"><b>63</b></td><td class="num">27</td><td class="num">15</td><td class="num">15</td><td class="num">4</td></tr>
+        <tr><td>04/17 - 04/23</td><td class="num"><b class="accent">68</b></td><td class="num"><b>42</b></td><td class="num">23</td><td class="num">9</td><td class="num">10</td></tr>
+        <tr><td>04/24 - 04/30</td><td class="num">48</td><td class="num"><b class="accent">47</b></td><td class="num">17</td><td class="num">2</td><td class="num">19</td></tr>
+        <tr><td>05/01 - 05/07</td><td class="num">18</td><td class="num">19</td><td class="num">3</td><td class="num">0</td><td class="num">17</td></tr>
+        <tr><td>05/08 - 05/14</td><td class="num">0</td><td class="num">1</td><td class="num">0</td><td class="num">0</td><td class="num">0</td></tr>
+        <tr class="hl">
+          <td><b>5 周合计</b></td>
+          <td class="num"><b>228</b></td>
+          <td class="num"><b>147</b></td>
+          <td class="num">69</td>
+          <td class="num">34</td>
+          <td class="num">—</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="row c3" style="margin-top:24px;">
+    <div class="card">
+      <div class="label">Spring 峰值周</div>
+      <div class="value accent">68</div>
+      <div class="desc"><b>4/17-4/23</b> 一周 68 人 → 这是团队的真实上限峰值。</div>
+    </div>
+    <div class="card">
+      <div class="label">Spring 平均（5 周）</div>
+      <div class="value">38</div>
+      <div class="desc">每周加入 / onboarding 节奏。对应 Fall 6/30-7/30 的 ~40/周目标。</div>
+    </div>
+    <div class="card">
+      <div class="label">5 月骤降</div>
+      <div class="value red">−74%</div>
+      <div class="desc">从峰值 68 → 5/1 的 18。<b>Coach 准备休假，已主动停招</b>。</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ §6 关键结论 ============ -->
+<section>
+  <h2 class="head">06 · 关键结论 <em>& Fall 行动项</em></h2>
+  <p class="head-deck">从 192 个候选人的数据里能学到什么 → 直接转化为 Fall 招募的 5 个具体改进。</p>
+
+  <h3 class="sub"><span class="marker">¶</span>3 个最重要的发现</h3>
+
+  <div class="callout success">
+    <div class="ctitle"><span class="tag">Finding 1</span>流程本身够丝滑</div>
+    Median 3 天完成，76% 在 7 天内完成。各环节 median 都在 1 天以内——<b>流程不是瓶颈，跟进沟通才是</b>。
+  </div>
+
+  <div class="callout danger">
+    <div class="ctitle"><span class="tag">Finding 2</span>合同环节是最大漏点（−66 / 34%）</div>
+    <b>发 offer → 发合同 → 签合同</b> 两步合计漏掉 66 人（占总流失的 87%）。其中失联 9 人 + 不满意合同条款 6 人是可以提前预防的损失。
+  </div>
+
+  <div class="callout warn">
+    <div class="ctitle"><span class="tag">Finding 3</span>50 人在途，能救回 15-20</div>
+    在途 50 人里 24 人卡在"待发合同"环节，大概率会终止。但其中也藏着 15-20 个潜在 onboarding，<b>6/1 前应该集中梳理一遍，把可救的人拉进 Fall 复活池</b>。
+  </div>
+
+  <h3 class="sub"><span class="marker">¶</span>Fall 招募的 5 个具体改进</h3>
+
+  <div class="table-wrap">
+    <table class="data">
+      <thead>
+        <tr>
+          <th>改进</th>
+          <th>预期效果</th>
+          <th>实施难度</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="hl">
+          <td><b>① Offer → 合同自动化跟进</b><br><small style="color:var(--muted);">offer 发出 24h 无响应 → 自动 email；48h → 人工 nudge</small></td>
+          <td>失联 9 人 → 4 人，<b>+5 onboarding</b></td>
+          <td>低（邮件模板）</td>
+        </tr>
+        <tr>
+          <td><b>② Offer 邮件附"硬要求清单"</b><br><small style="color:var(--muted);">独立账号、多平台发布、basepay 数字，提前讲清</small></td>
+          <td>合同环节流失 −20%，<b>+6 onboarding</b></td>
+          <td>低（修改 1 个邮件模板）</td>
+        </tr>
+        <tr>
+          <td><b>③ 合同环节增加"signing call"</b><br><small style="color:var(--muted);">14 天未签 → 主动约 15 分钟 video call 解答疑问</small></td>
+          <td>"待签"19 人 → 救回 10 人</td>
+          <td>中（占用 coach 时间）</td>
+        </tr>
+        <tr>
+          <td><b>④ 已签合同的人 → 帮他们建账号</b><br><small style="color:var(--muted);">不要让他们自己摸索，直接 video guide / 1-on-1</small></td>
+          <td>"待建号" 5 人 → 救回 4 人</td>
+          <td>中</td>
+        </tr>
+        <tr>
+          <td><b>⑤ Fall 招募节奏目标</b><br><small style="color:var(--muted);">基于 60% 真实转化率反推，6/30-7/30 发 250 offer / 4 周</small></td>
+          <td>8/1 进 warmup ≥150 人</td>
+          <td>团队压力 1.6x spring</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout info" style="margin-top:24px;">
+    <div class="ctitle"><span class="tag">真实 Yes → Onboarding 转化率</span>用 spring 数据校准 Fall plan</div>
+    <b>spring 实测：117 / 192 = 61%</b>，把"在途"算成 30% 救回率：(117 + 50×30%) / 192 = <b>69%</b>。
+    <br><br>
+    Fall plan 建议 Yes → Onboarding 转化率用 <b>60-65%</b>（保守）。意味着 8/1 想让 150 人进 warmup，6/30-7/30 需发 <b>230-250 个 offer</b>。
+  </div>
+</section>
+
+<footer class="colophon">
+  <div>Solvely · <b>Spring 2026 Onboarding Diagnostic Report</b> · v1.0</div>
+  <div style="margin-top:6px;">数据来源：Onboarding 流程情况.xlsx · 192 records · Coverage 2026-03-27 → 2026-05-14 · Generated 2026-05-27</div>
+</footer>
+
+</main>
+
+</body>
+</html>
